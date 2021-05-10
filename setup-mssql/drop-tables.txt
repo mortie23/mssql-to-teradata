@@ -1,0 +1,15 @@
+
+LogTimestamp          LogMessage
+------------          ----------
+10/05/2021 8:33:21 PM Start of drop contraint
+10/05/2021 8:33:21 PM Drop Contraints statement built
+10/05/2021 8:33:21 PM Drop GAME_STATS
+10/05/2021 8:33:21 PM Drop GAME_TYPE
+10/05/2021 8:33:21 PM Drop GAME_VENUE
+10/05/2021 8:33:21 PM Drop GAME
+10/05/2021 8:33:21 PM Drop PLAYER
+10/05/2021 8:33:21 PM Drop TEAM_LOOKUP
+10/05/2021 8:33:21 PM Drop VENUE
+10/05/2021 8:33:21 PM Drop WEATHER
+10/05/2021 8:33:21 PM Completed drops
+

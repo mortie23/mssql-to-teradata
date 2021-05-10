@@ -1,0 +1,103 @@
+-- Author:  Christopher Mortimer
+-- Date:    2019-10-22
+-- Desc:    Import a CSV file to SQL server using the BULK INSERT
+-- Note:    Need to change the file to have CRLF not LF (Unix)
+--          FIELDQUOTE is not working at the moment
+--          Online forums suggest to use SSIS instead of the BULK INSERT method
+--          Attempted the SSIS method, and the learning curve was more than cutting code
+-- Usage:   Invoke-Sqlcmd -InputFile "nfl-player.sql" -ServerInstance "localhost\SQLEXPRESS" | Out-File -FilePath "nfl-player.txt"
+--          Invoke-Sqlcmd -InputFile "nfl-player.sql" -ServerInstance "localhost\SQLEXPRESS" -Username mortimer -Password mortimer | Out-File -FilePath "nfl-player.txt" 
+
+SELECT GETDATE() AS TimeOfQuery
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+-- Create table
+CREATE TABLE [PRD_LA_NFL].[DBO].[PLAYER] (
+  [WEEK] VARCHAR(50)
+  , [GAME_ID] VARCHAR(50) NULL
+  , [TEAM_ID] VARCHAR(50) NULL
+  , [LOCATION] VARCHAR(50) NULL
+  , [PLAYER_NAME] VARCHAR(100) NULL
+  , [FIELD_POSITION] VARCHAR(50) NULL
+  , [RUSHING_ATTEMPTS] VARCHAR(50) NULL
+  , [RUSHING_YARDS] VARCHAR(50) NULL
+  , [RUSHING_TD] VARCHAR(50) NULL
+  , [RECEIVING_TARGETS] VARCHAR(50) NULL
+  , [RECEPTIONS] VARCHAR(50) NULL
+  , [RECEIVING_YARDS] VARCHAR(50) NULL
+  , [RECEIVING_TD] VARCHAR(50) NULL
+  , [TOTAL_TD] VARCHAR(50) NULL
+  , [FUMBLES] VARCHAR(50) NULL
+  , [PASS_ATTEMPTS] VARCHAR(50) NULL
+  , [PASS_COMPLETIONS] VARCHAR(50) NULL
+  , [PASSING_YARDS] VARCHAR(50) NULL
+  , [PASSING_TD] VARCHAR(50) NULL
+  , [INTERCEPTIONS] VARCHAR(50) NULL
+) ON [PRIMARY]
+GO
+-- Insert into landing zone from file 
+BULK INSERT [PRD_LA_NFL].[DBO].[PLAYER]
+FROM N'$(rootPath)\data\player.csv'
+WITH
+(
+  FIRSTROW = 2,
+    FIELDTERMINATOR = ',', 
+    ROWTERMINATOR = '0x0A',  
+    TABLOCK
+)
+;
+-- Create source image table
+CREATE TABLE [PRD_SI_NFL].[DBO].[PLAYER] (
+  [WEEK] INTEGER
+  , [GAME_ID] INTEGER NOT NULL
+  , [TEAM_ID] INTEGER NOT NULL
+  , [LOCATION] VARCHAR(50) NULL
+  , [PLAYER_NAME] VARCHAR(100) NOT NULL
+  , [FIELD_POSITION] CHAR(3) NULL
+  , [RUSHING_ATTEMPTS] INTEGER NULL
+  , [RUSHING_YARDS] INTEGER NULL
+  , [RUSHING_TD] INTEGER NULL
+  , [RECEIVING_TARGETS] INTEGER NULL
+  , [RECEPTIONS] INTEGER NULL
+  , [RECEIVING_YARDS] INTEGER NULL
+  , [RECEIVING_TD] INTEGER NULL
+  , [TOTAL_TD] INTEGER NULL
+  , [FUMBLES] INTEGER NULL
+  , [PASS_ATTEMPTS] INTEGER NULL
+  , [PASS_COMPLETIONS] INTEGER NULL
+  , [PASSING_YARDS] INTEGER NULL
+  , [PASSING_TD] INTEGER NULL
+  , [INTERCEPTIONS] INTEGER NULL
+  , CONSTRAINT FK_PLAYER_GAME_ID FOREIGN KEY ([GAME_ID])
+    REFERENCES [dbo].[GAME] ([GAME_ID])
+  , CONSTRAINT FK_PLAYER_TEAM_ID FOREIGN KEY ([TEAM_ID])
+    REFERENCES [dbo].[TEAM_LOOKUP] ([TEAM_ID])
+) ON [PRIMARY]
+GO
+-- Transform from landing into source image with correct data types
+INSERT INTO [PRD_SI_NFL].[DBO].[PLAYER]
+SELECT  CAST([WEEK] AS INTEGER)
+        , CAST([GAME_ID] AS INTEGER)
+        , CAST([TEAM_ID] AS INTEGER)
+        , REPLACE([LOCATION], '"', '')
+        , REPLACE([PLAYER_NAME], '"', '')
+        , REPLACE([FIELD_POSITION], '"', '')
+        , CAST([RUSHING_ATTEMPTS] AS INTEGER)
+        , CAST([RUSHING_YARDS] AS INTEGER)
+        , CAST([RUSHING_TD] AS INTEGER)
+        , CAST([RECEIVING_TARGETS] AS INTEGER)
+        , CAST([RECEPTIONS] AS INTEGER)
+        , CAST([RECEIVING_YARDS] AS INTEGER)
+        , CAST([RECEIVING_TD] AS INTEGER)
+        , CAST([TOTAL_TD] AS INTEGER)
+        , CAST([FUMBLES] AS INTEGER)
+        , CAST([PASS_ATTEMPTS] AS INTEGER)
+        , CAST([PASS_COMPLETIONS] AS INTEGER)
+        , CAST([PASSING_YARDS] AS INTEGER)
+        , CAST([PASSING_TD] AS INTEGER)
+        , CAST(REPLACE([INTERCEPTIONS], ',', '') AS INTEGER)
+FROM  [PRD_LA_NFL].[DBO].[PLAYER]
+;
+SELECT GETDATE() AS TimeOfQuery
