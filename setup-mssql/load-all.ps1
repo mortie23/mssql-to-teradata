@@ -8,45 +8,43 @@
 # @serverName: XPSCOLD
 
 $rootPath = Split-Path -Parent $MyInvocation.MyCommand.Definition
-Write-Host $rootPath
-. .\function-lib\timestamp.ps1
-$timestamp = $(Get-TimeStamp) 
-Write-Host $timestamp
 
 # Pass the server name as an argument
 $serverName = $args[0]
 Write-Host $serverName
 
-function drops {
+function drops($rootPath) {
   <#
   .drops
   drops function executes the sql to drop all constraints and then tables
   #>
-  Invoke-Sqlcmd -InputFile "$rootPath\drop-tables.sql" -ServerInstance "$serverName" | Out-File -FilePath "$rootPath\drop-tables.txt"
+  Invoke-Sqlcmd -InputFile "$rootPath\drop-tables.sql" -ServerInstance "$serverName" -Variable "rootPath=$rootPath" | Out-File -FilePath "$rootPath\drop-tables.txt"
+  Write-Host "Dropped"
 }
 # Drop all constrainsts and tables
-drops
+drops $rootPath
 
 # Load all the data
-function loads {
+function loads($rootPath) {
   <#
   .loads
   loads function executes the sql for each table to load the CSV files to the tables
   #>
   # No Dependancies
-  Invoke-Sqlcmd -InputFile "$rootPath\nfl-team_lookup.sql" -ServerInstance "$serverName" | Out-File -FilePath "$rootPath\nfl-team_lookup.txt"
-  Invoke-Sqlcmd -InputFile "$rootPath\nfl-game_type.sql" -ServerInstance "$serverName" | Out-File -FilePath "$rootPath\nfl-game_type.txt"
-  Invoke-Sqlcmd -InputFile "$rootPath\nfl-venue.sql" -ServerInstance "$serverName" | Out-File -FilePath "$rootPath\nfl-venue.txt"
+  Invoke-Sqlcmd -InputFile "$rootPath\nfl-team_lookup.sql" -ServerInstance "$serverName" -Variable "rootPath=$rootPath" | Out-File -FilePath "$rootPath\nfl-team_lookup.txt"
+  Invoke-Sqlcmd -InputFile "$rootPath\nfl-game_type.sql" -ServerInstance "$serverName" -Variable "rootPath=$rootPath" | Out-File -FilePath "$rootPath\nfl-game_type.txt"
+  Invoke-Sqlcmd -InputFile "$rootPath\nfl-venue.sql" -ServerInstance "$serverName" -Variable "rootPath=$rootPath" | Out-File -FilePath "$rootPath\nfl-venue.txt"
   # Dependancies GAME_TYPE
-  Invoke-Sqlcmd -InputFile "$rootPath\nfl-game.sql" -ServerInstance "$serverName" | Out-File -FilePath "$rootPath\nfl-game.txt"
+  Invoke-Sqlcmd -InputFile "$rootPath\nfl-game.sql" -ServerInstance "$serverName" -Variable "rootPath=$rootPath" | Out-File -FilePath "$rootPath\nfl-game.txt"
   # Dependancies GAME and TEAM_LOOKUP
-  Invoke-Sqlcmd -InputFile "$rootPath\nfl-game_stats.sql" -ServerInstance "$serverName" | Out-File -FilePath "$rootPath\nfl-game_stats.txt"
+  Invoke-Sqlcmd -InputFile "$rootPath\nfl-game_stats.sql" -ServerInstance "$serverName" -Variable "rootPath=$rootPath" | Out-File -FilePath "$rootPath\nfl-game_stats.txt"
   # Dependancies GAME and VENUE
-  Invoke-Sqlcmd -InputFile "$rootPath\nfl-game_venue.sql" -ServerInstance "$serverName" | Out-File -FilePath "$rootPath\nfl-game_venue.txt"
+  Invoke-Sqlcmd -InputFile "$rootPath\nfl-game_venue.sql" -ServerInstance "$serverName" -Variable "rootPath=$rootPath" | Out-File -FilePath "$rootPath\nfl-game_venue.txt"
   # Dependancies GAME
-  Invoke-Sqlcmd -InputFile "$rootPath\nfl-weather.sql" -ServerInstance "$serverName" | Out-File -FilePath "$rootPath\nfl-weather.txt"
+  Invoke-Sqlcmd -InputFile "$rootPath\nfl-weather.sql" -ServerInstance "$serverName" -Variable "rootPath=$rootPath" | Out-File -FilePath "$rootPath\nfl-weather.txt"
   # Dependancies GAME and TEAM_LOOKUP
-  Invoke-Sqlcmd -InputFile "$rootPath\nfl-player.sql" -ServerInstance "$serverName" | Out-File -FilePath "$rootPath\nfl-player.txt"
+  Invoke-Sqlcmd -InputFile "$rootPath\nfl-player.sql" -ServerInstance "$serverName" -Variable "rootPath=$rootPath" | Out-File -FilePath "$rootPath\nfl-player.txt"
+  Write-Host "Loaded"
 }
 # Load all tables
-loads
+loads $rootPath
