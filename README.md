@@ -8,11 +8,6 @@ Also I installed SQL Server Management Studio.
 
 Run the `database-setup.sql` to deploy the two databases that will be used as the source.
 
-```sql
-create database PRD_LA_NFL;
-create database PRD_SI_NFL;
-```
-
 ## Load source files
 
 ```sh
