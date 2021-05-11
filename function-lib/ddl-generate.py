@@ -86,7 +86,7 @@ def createViewDDL(ext):
   viewFile.write("-- Author: Automagic\n")
   viewFile.write("-- Date:   " + strftime("%Y-%m-%d %H:%M:%S", gmtime()) + "\n")
   viewFile.write("-- Desc:   Table definition for " + ext + "\n\n")
-  viewFile.write('REPLACE VIEW EDW_PRD_NFL_DB.' + ext + '_V AS')
+  viewFile.write('REPLACE VIEW PRD_ADS_NFL_DB.' + ext + '_V AS')
   viewFile.write('\nSELECT')
   # Loop through all the columns
   for index, row in view.iterrows():
@@ -100,7 +100,7 @@ def createViewDDL(ext):
   # Finish off the file
   viewFile.write('\n  , CURRENT_USER AS EXTRACT_USER')
   viewFile.write('\n  , CURRENT_TIMESTAMP AS EXTRACT_TIMESTAMP')
-  viewLine = '\nFROM\n  EDW_PRD_NFL_DB.' + ext + '\n;\n'
+  viewLine = '\nFROM\n  PRD_ADS_NFL_DB.' + ext + '\n;\n'
   viewFile.write(viewLine)
 
 def createStgDDL(ext):
@@ -120,8 +120,8 @@ def createStgDDL(ext):
   ddlFile.write("-- Author: Automagic\n")
   ddlFile.write("-- Date:   " + strftime("%Y-%m-%d %H:%M:%S", gmtime()) + "\n")
   ddlFile.write("-- Desc:   Table definition for " + ext + "\n\n")
-  ddlFile.write('DROP TABLE EDW_PRD_NFL_DB.' + ext + ';\n')
-  ddlFile.write('CREATE TABLE EDW_PRD_NFL_DB.' + ext + ' (')
+  ddlFile.write('DROP TABLE PRD_ADS_NFL_DB.' + ext + ';\n')
+  ddlFile.write('CREATE TABLE PRD_ADS_NFL_DB.' + ext + ' (')
   # Loop through all the columns
   for index, row in ddl.iterrows():
     # On first row set this as the primary index
