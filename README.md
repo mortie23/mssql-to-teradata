@@ -14,3 +14,16 @@ Run the `database-setup.sql` to deploy the two databases that will be used as th
 .\setup-mssql\load-all.ps1 <servername>
 # in this case the servername is just the computer name of my XPS
 ```
+
+These source files are loaded to the database to simply resemble a source database.
+
+## Extract the source data to files
+
+```sh
+.\extract.ps1 
+```
+## Load the extracts to Teradata
+
+```sh
+.\load.ps1 
+```
