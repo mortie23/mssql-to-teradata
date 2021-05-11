@@ -16,7 +16,12 @@ function csv($rootPath, $tableName) {
   Write-Output (-join('{"message": "parameter", "tableName": "', $tableName, '"}')) `
     | Tee-Object -file "$rootPath\logs\run_mssql_$timestamp.json" -Append
 
-  $SqlQuery = "SELECT * FROM [$database].[$schema].[$tableName]" 
+  $SqlQuery = "
+  SELECT
+    *
+  FROM
+    [$SQLDBName].[DBO].[$tableName]
+  " 
 
   $SqlConnection = New-Object System.Data.SqlClient.SqlConnection  
   $SqlConnection.ConnectionString = "Server = $SQLServer; Database = $SQLDBName; Integrated Security = True;"  
@@ -27,17 +32,17 @@ function csv($rootPath, $tableName) {
   $SqlAdapter.SelectCommand = $SqlCmd   
 
   # Set the date format
-  (Get-Culture).DateTimeFormat.ShortDatePattern="yyyy-MM-dd"
+  (Get-Culture).Clone().DateTimeFormat.ShortDatePattern="yyyy-MM-dd"
   # Export the data to file  
   $DataSet = New-Object System.Data.DataSet  
   $SqlAdapter.Fill($DataSet)  
-  Write-Output (-join('{"message": "info", "writing-csv": "', $tableName, '"}')) `
+  Write-Output (-join('{"message": "info", "writing-table-csv": "', $tableName, '"}')) `
     | Tee-Object -file "$rootPath\logs\run_mssql_$timestamp.json" -Append
   # This method adds headers which Teradata tdload does not like
   # Not using tdload anymore for reasons, using full TPT now
   $DataSet.Tables[0] | export-csv -Delimiter ',' -Path "$rootPath\extract\$tableName.csv" -NoTypeInformation
   #$DataSet.Tables[0] | ConvertTo-Csv -NoType | Select-Object -Skip 1 | Set-Content "$rootPath\extract\$tableName.csv"
 
-  Write-Output (-join('{"message": "info", "finished-csv": "', $tableName, '"}')) `
+  Write-Output (-join('{"message": "info", "finished-table-csv": "', $tableName, '"}')) `
     | Tee-Object -file "$rootPath\logs\run_mssql_$timestamp.json" -Append
 }

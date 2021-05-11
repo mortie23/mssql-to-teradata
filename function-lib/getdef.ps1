@@ -36,7 +36,7 @@ function getDef($rootPath, $tableName) {
   $SqlAdapter.SelectCommand = $SqlCmd   
 
   # Set the date format
-  (Get-Culture).DateTimeFormat.ShortDatePattern="yyyy-MM-dd"
+  (Get-Culture).Clone().DateTimeFormat.ShortDatePattern="yyyy-MM-dd"
   # Export the data to file  
   $DataSet = New-Object System.Data.DataSet  
   $SqlAdapter.Fill($DataSet)  
