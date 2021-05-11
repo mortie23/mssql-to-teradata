@@ -1,0 +1,6 @@
+"ORDINAL_POSITION","COLUMN_NAME","DATA_TYPE","CHARACTER_MAXIMUM_LENGTH","NUMERIC_PRECISION","NUMERIC_SCALE","IS_NULLABLE"
+"1","TEAM_ID","int","","10","0","NO"
+"2","TEAM_LONG","varchar","50","","","YES"
+"3","TEAM_SHORT","char","3","","","YES"
+"4","CONFERENCE","char","3","","","YES"
+"5","DIVISION","varchar","10","","","YES"

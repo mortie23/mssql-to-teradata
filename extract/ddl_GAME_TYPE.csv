@@ -1,0 +1,5 @@
+"ORDINAL_POSITION","COLUMN_NAME","DATA_TYPE","CHARACTER_MAXIMUM_LENGTH","NUMERIC_PRECISION","NUMERIC_SCALE","IS_NULLABLE"
+"1","GAME_TYPE_ID","int","","10","0","NO"
+"2","GAME_TYPE","char","3","","","YES"
+"3","CREATED_DATE","datetimeoffset","","","","YES"
+"4","CREATE_USER","varchar","50","","","YES"

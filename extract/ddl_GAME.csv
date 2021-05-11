@@ -1,0 +1,8 @@
+"ORDINAL_POSITION","COLUMN_NAME","DATA_TYPE","CHARACTER_MAXIMUM_LENGTH","NUMERIC_PRECISION","NUMERIC_SCALE","IS_NULLABLE"
+"1","GAME_ID","int","","10","0","NO"
+"2","GAME_TYPE_ID","int","","10","0","NO"
+"3","WEEK","int","","10","0","YES"
+"4","TEAM_SHORT","char","3","","","NO"
+"5","OPPONENT","varchar","50","","","YES"
+"6","CREATED_DATE","datetimeoffset","","","","YES"
+"7","CREATE_USER","varchar","50","","","YES"
