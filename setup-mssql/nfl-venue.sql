@@ -14,7 +14,7 @@ GO
 SET QUOTED_IDENTIFIER ON
 GO
 -- Create table
-CREATE TABLE [PRD_LA_NFL].[DBO].[VENUE] (
+CREATE TABLE [nfl].[VENUE] (
   VENUE_ID VARCHAR(50)
     , VENUE_NAME VARCHAR(50)
     , CAPACITY VARCHAR(50)
@@ -25,7 +25,7 @@ CREATE TABLE [PRD_LA_NFL].[DBO].[VENUE] (
 ) ON [PRIMARY]
 GO
 -- Insert into landing zone from file 
-BULK INSERT [PRD_LA_NFL].[DBO].[VENUE]
+BULK INSERT [nfl].[VENUE]
 FROM N'$(rootPath)\data\venue.csv'
 WITH
 (
@@ -36,7 +36,7 @@ WITH
 )
 ;
 -- Create source image table
-CREATE TABLE [PRD_SI_NFL].[DBO].[VENUE] (
+CREATE TABLE [nfl_si].[VENUE] (
   VENUE_ID INTEGER NOT NULL
     , VENUE_NAME VARCHAR(50) NULL
     , CAPACITY INTEGER NULL
@@ -48,7 +48,7 @@ CREATE TABLE [PRD_SI_NFL].[DBO].[VENUE] (
 ) ON [PRIMARY]
 GO
 -- Transform from landing into source image with correct data types
-INSERT INTO [PRD_SI_NFL].[DBO].[VENUE]
+INSERT INTO [nfl_si].[VENUE]
 SELECT  CAST([VENUE_ID] AS INTEGER)
     , REPLACE([VENUE_NAME], '"', '')
     , CAST([CAPACITY] AS INTEGER)
@@ -56,6 +56,6 @@ SELECT  CAST([VENUE_ID] AS INTEGER)
     , REPLACE([VENUE_TYPE], '"', '')
     , CAST(REPLACE([CREATED_DATE], '"', '') AS DATETIMEOFFSET)
     , REPLACE(REPLACE([CREATE_USER], '"', ''), ',', '')
-FROM  [PRD_LA_NFL].[DBO].[VENUE]
+FROM  [nfl].[VENUE]
 ;
 SELECT GETDATE() AS TimeOfQuery

@@ -14,7 +14,7 @@ GO
 SET QUOTED_IDENTIFIER ON
 GO
 -- Create table
-CREATE TABLE [PRD_LA_NFL].[DBO].[GAME_TYPE] (
+CREATE TABLE [nfl].[GAME_TYPE] (
   GAME_TYPE_ID VARCHAR(50)
     , GAME_TYPE VARCHAR(50)
     , CREATED_DATE VARCHAR(50)
@@ -22,7 +22,7 @@ CREATE TABLE [PRD_LA_NFL].[DBO].[GAME_TYPE] (
 ) ON [PRIMARY]
 GO
 -- Insert into landing zone from file 
-BULK INSERT [PRD_LA_NFL].[DBO].[GAME_TYPE]
+BULK INSERT [nfl].[GAME_TYPE]
 FROM N'$(rootPath)\data\game_type.csv'
 WITH
 (
@@ -33,7 +33,7 @@ WITH
 )
 ;
 -- Create source image table
-CREATE TABLE [PRD_SI_NFL].[DBO].[GAME_TYPE] (
+CREATE TABLE [nfl_si].[GAME_TYPE] (
   GAME_TYPE_ID INTEGER NOT NULL
     , GAME_TYPE CHAR(3)
     , CREATED_DATE DATETIMEOFFSET
@@ -42,11 +42,11 @@ CREATE TABLE [PRD_SI_NFL].[DBO].[GAME_TYPE] (
 ) ON [PRIMARY]
 GO
 -- Transform from landing into source image with correct data types
-INSERT INTO [PRD_SI_NFL].[DBO].[GAME_TYPE]
+INSERT INTO [nfl_si].[GAME_TYPE]
 SELECT  CAST([GAME_TYPE_ID] AS INTEGER)
     , REPLACE([GAME_TYPE] , '"', '')
     , CAST(REPLACE([CREATED_DATE], '"', '') AS DATETIMEOFFSET)
     , REPLACE(REPLACE([CREATE_USER], '"', ''), ',', '')
-FROM  [PRD_LA_NFL].[DBO].[GAME_TYPE]
+FROM  [nfl].[GAME_TYPE]
 ;
 SELECT GETDATE() AS TimeOfQuery

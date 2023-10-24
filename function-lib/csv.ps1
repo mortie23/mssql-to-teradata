@@ -20,7 +20,7 @@ function csv($rootPath, $tableName) {
   SELECT
     *
   FROM
-    [$SQLDBName].[DBO].[$tableName]
+    [$SQLDBName].[nfl].[$tableName]
   " 
 
   $SqlConnection = New-Object System.Data.SqlClient.SqlConnection  

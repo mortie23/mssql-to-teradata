@@ -14,7 +14,7 @@ GO
 SET QUOTED_IDENTIFIER ON
 GO
 -- Create table
-CREATE TABLE [PRD_LA_NFL].[DBO].[WEATHER] (
+CREATE TABLE [nfl].[WEATHER] (
   [GAME_ID] VARCHAR(50)
     , [TEMPERATURE] VARCHAR(50)
     , [WEATHER_CONDITION] VARCHAR(50)
@@ -26,8 +26,8 @@ CREATE TABLE [PRD_LA_NFL].[DBO].[WEATHER] (
 ) ON [PRIMARY]
 GO
 -- Insert into landing zone from file 
-BULK INSERT [PRD_LA_NFL].[DBO].[WEATHER]
-FROM N'$(rootPath)\data\weather.csv'
+BULK INSERT [nfl].[WEATHER]
+FROM '/home/mortimer/git/github/mortie23/mssql-to-teradata/setup-mssql/data/weather.csv'
 WITH
 (
   FIRSTROW = 2,
@@ -37,7 +37,7 @@ WITH
 )
 ;
 -- Create source image table
-CREATE TABLE [PRD_SI_NFL].[DBO].[WEATHER] (
+CREATE TABLE [nfl_si].[WEATHER] (
   [GAME_ID] INTEGER NOT NULL
     , [TEMPERATURE] INTEGER NULL
     , [WEATHER_CONDITION] VARCHAR(50) NULL
@@ -47,11 +47,11 @@ CREATE TABLE [PRD_SI_NFL].[DBO].[WEATHER] (
     , [CREATED_DATE] DATETIMEOFFSET NULL
     , [CREATE_USER] VARCHAR(50) NULL
     , CONSTRAINT FK_WEATHER_GAME_ID FOREIGN KEY ([GAME_ID])
-    REFERENCES [dbo].[GAME] ([GAME_ID])
+    REFERENCES [nfl_si].[GAME] ([GAME_ID])
 ) ON [PRIMARY]
 GO
 -- Transform from landing into source image with correct data types
-INSERT INTO [PRD_SI_NFL].[DBO].[WEATHER]
+INSERT INTO [nfl_si].[WEATHER]
 SELECT  CAST([GAME_ID] AS INTEGER)
     , CAST([TEMPERATURE] AS INTEGER)
     , REPLACE([WEATHER_CONDITION], '"', '')
@@ -60,6 +60,6 @@ SELECT  CAST([GAME_ID] AS INTEGER)
     , REPLACE([WIND_DIRECTION], '"', '')
     , CAST(REPLACE([CREATED_DATE], '"', '') AS DATETIMEOFFSET)
     , REPLACE(REPLACE([CREATE_USER], '"', ''), ',', '')
-FROM  [PRD_LA_NFL].[DBO].[WEATHER]
+FROM  [nfl].[WEATHER]
 ;
 SELECT GETDATE() AS TimeOfQuery

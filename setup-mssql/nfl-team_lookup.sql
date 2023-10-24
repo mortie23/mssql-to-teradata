@@ -14,7 +14,7 @@ GO
 SET QUOTED_IDENTIFIER ON
 GO
 -- Create table
-CREATE TABLE [PRD_LA_NFL].[DBO].[TEAM_LOOKUP] (
+CREATE TABLE [nfl].[TEAM_LOOKUP] (
   TEAM_ID VARCHAR(50)
     , TEAM_LONG VARCHAR(50)
     , TEAM_SHORT VARCHAR(50)
@@ -23,7 +23,7 @@ CREATE TABLE [PRD_LA_NFL].[DBO].[TEAM_LOOKUP] (
 ) ON [PRIMARY]
 GO
 -- Insert into landing zone from file 
-BULK INSERT [PRD_LA_NFL].[DBO].[TEAM_LOOKUP]
+BULK INSERT [nfl].[TEAM_LOOKUP]
 FROM N'$(rootPath)\data\team_lookup.csv'
 WITH
 (
@@ -34,7 +34,7 @@ WITH
 )
 ;
 -- Create source image table
-CREATE TABLE [PRD_SI_NFL].[DBO].[TEAM_LOOKUP] (
+CREATE TABLE [nfl_si].[TEAM_LOOKUP] (
   TEAM_ID INTEGER NOT NULL
     , TEAM_LONG VARCHAR(50)
     , TEAM_SHORT CHAR(3)
@@ -44,12 +44,12 @@ CREATE TABLE [PRD_SI_NFL].[DBO].[TEAM_LOOKUP] (
 ) ON [PRIMARY]
 GO
 -- Transform from landing into source image with correct data types
-INSERT INTO [PRD_SI_NFL].[DBO].[TEAM_LOOKUP]
+INSERT INTO [nfl_si].[TEAM_LOOKUP]
 SELECT  CAST([TEAM_ID] AS INTEGER)
         , REPLACE([TEAM_LONG], '"', '')
     , REPLACE([TEAM_SHORT], '"', '')
     , REPLACE([CONFERENCE], '"', '')
     , REPLACE(REPLACE([DIVISION], '"', ''), ',', '')
-FROM  [PRD_LA_NFL].[DBO].[TEAM_LOOKUP]
+FROM  [nfl].[TEAM_LOOKUP]
 ;
 SELECT GETDATE() AS TimeOfQuery
