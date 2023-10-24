@@ -10,7 +10,7 @@ logging.basicConfig()
 logging.getLogger("sqlalchemy.engine").setLevel(logging.INFO)
 
 load_dotenv()
-MSSQL_PASSWORD = os.getenv("MSSQL_PASSWORD"
+MSSQL_PASSWORD = os.getenv("MSSQL_PASSWORD")
 
 # %%
 # Define your Azure SQL Server connection string
@@ -53,7 +53,31 @@ engine = create_engine("mssql+pyodbc://", creator=lambda: conn)
 query = "SELECT * FROM [information_schema].[tables]"
 df = pd.read_sql(query, engine)
 
+
 # %%
+def truncate_table(table_name: str) -> dict:
+    """Truncate a table in the NFL schema
+
+    Args:
+        table_name (str): The name of the table
+
+    Returns:
+        dict: _description_
+    """
+
+    try:
+        # Execute the SQL command to truncate the table
+        cursor = conn.cursor()
+        command = f"TRUNCATE TABLE [nfl].[{table_name}]"
+        cursor.execute(command)
+        conn.commit()
+        response = {"response": "success"}
+    except Exception as e:
+        response = {"response": e}
+    finally:
+        return response
+
+
 def load_table(table_name: str) -> dict:
     """Load data from a CSV file to a table in Azure SQL DB
 
@@ -66,9 +90,10 @@ def load_table(table_name: str) -> dict:
 
     # read data from CSV
     df_data = pd.read_csv(f"../data/{table_name}.csv")
+    truncate_table(table_name)
 
     num_records = df_data.to_sql(
-        name="weather", schema="nfl", con=engine, if_exists="append", index=False
+        name=f"{table_name}", schema="nfl", con=engine, if_exists="append", index=False
     )
 
     # Test existence of data in table
@@ -77,7 +102,14 @@ def load_table(table_name: str) -> dict:
 
     return {"loaded": num_records, "table_count": len(df)}
 
+
 # %%
-load_table("weather")
+load_table("game")
+load_table("game_stats")
+load_table("game_type")
+load_table("game_venue")
+load_table("player")
+load_table("team_lookup")
 load_table("venue")
+load_table("weather")
 # %%
