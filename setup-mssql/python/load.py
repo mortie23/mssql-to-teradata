@@ -12,32 +12,50 @@ logging.getLogger("sqlalchemy.engine").setLevel(logging.INFO)
 load_dotenv()
 MSSQL_PASSWORD = os.getenv("MSSQL_PASSWORD")
 
+
 # %%
-# Define your Azure SQL Server connection string
-server_name = "tcp:mortimer.database.windows.net"
-port = "1433"
-database = "mortimer_dev"
-username = "mortimer"
-password = MSSQL_PASSWORD
-driver = "ODBC Driver 17 for SQL Server"
+# Azure SQL DB
+def connect_mssql_azuredb() -> pyodbc.Connection:
+    server_name = "tcp:mortimer.database.windows.net"
+    port = "1433"
+    database = "mortimer_dev"
+    username = "mortimer"
 
-# URL-encode the special characters in the password
-password_encode = urllib.parse.quote_plus(password)
-server_name_encoded = urllib.parse.quote_plus(server_name)
+    # URL-encode the special characters in the password
+    password_encode = urllib.parse.quote_plus(MSSQL_PASSWORD)
+    server_name_encoded = urllib.parse.quote_plus(server_name)
 
-conn_str = f"""
-Driver={{ODBC Driver 18 for SQL Server}};
-Server={server_name},{port};
-Database=mortimer_dev;
-Persist Security Info=False;
-UID=mortimer;
-PWD={password};
-MultipleActiveResultSets=False;
-Connection Timeout=30;
-"""
+    conn_str = f"""
+    Driver={{ODBC Driver 18 for SQL Server}};
+    Server={server_name_encoded},{port};
+    Database={database};
+    Persist Security Info=False;
+    UID={username};
+    PWD={password_encode};
+    MultipleActiveResultSets=False;
+    Connection Timeout=30;
+    """
 
-conn = pyodbc.connect(conn_str)
+    return pyodbc.connect(conn_str)
 
+
+# %%
+# Self hosted AWS EC2
+def connect_mssql_iaas() -> pyodbc.Connection:
+    database = "mortimer_dev"
+
+    conn_str = f"""
+    Driver={{ODBC Driver 18 for SQL Server}};
+    Server=mortie23.com,1433;
+    Database={database};
+    UID=sa;
+    PWD={MSSQL_PASSWORD};
+    TrustServerCertificate=yes;
+    """
+    return pyodbc.connect(conn_str)
+
+
+conn = connect_mssql_iaas()
 # %%
 # Test connection to Azure SQL DB to specific Database
 df = pd.read_sql_query(
